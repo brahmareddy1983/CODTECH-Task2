@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="quiz-container">
+        <h1>Interactive Quiz</h1>
+        <div id="question-container">
+            <div id="question">Question text will go here</div>
+            <div id="choices"></div>
+        </div>
+        <button id="submit-btn" onclick="submitAnswer()">Submit</button>
+        <div id="feedback"></div>
+        <button id="next-btn" onclick="nextQuestion()">Next Question</button>
+        <div id="results" style="display: none;">
+            <h2>Your Score: <span id="score"></span></h2>
+            <button onclick="restartQuiz()">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+<style>
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#quiz-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+}
+
+#question {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+#choices {
+    display: flex;
+    flex-direction: column;
+}
+
+.choice {
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:disabled {
+    background-color: #ccc;
+}
+
+#feedback {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#results {
+    margin-top: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+</style>
+<script>
+// script.js
+
+// Array of quiz questions, each containing a question, choices, and the correct answer index
+const quizData = [
+    {
+        question: "What is the capital of France?",
+        choices: ["Berlin", "Madrid", "Paris", "Lisbon"],
+        correctAnswer: 2
+    },
+    {
+        question:"10+20 equals to",
+        choices: ["5","30","57","10"],
+        correctAnswer: 1
+    },
+    {
+        question: "Which language is used for web development?",
+        choices: ["Python", "C++", "JavaScript", "Java"],
+        correctAnswer: 2
+    },
+    {
+        question:" A figure with four equal sides is called?", 
+        choices: ["circle", "triangle" , "square", "noun of the above"],
+        correctAnswer: 2
+    },
+    {
+        question: "What is the largest planet in our solar system?",
+        choices: ["Earth", "Mars", "Jupiter", "Saturn"],
+        correctAnswer: 2
+    }
+];
+
+let currentQuestionIndex = 0;
+let score = 0;
+
+function loadQuestion() {
+    const questionContainer = document.getElementById("question");
+    const choicesContainer = document.getElementById("choices");
+    const feedback = document.getElementById("feedback");
+    feedback.textContent = '';
+
+    const currentQuestion = quizData[currentQuestionIndex];
+    questionContainer.textContent = currentQuestion.question;
+    choicesContainer.innerHTML = '';
+
+    currentQuestion.choices.forEach((choice, index) => {
+        const choiceElement = document.createElement('div');
+        choiceElement.textContent = choice;
+        choiceElement.classList.add('choice');
+        choiceElement.onclick = () => selectAnswer(index);
+        choicesContainer.appendChild(choiceElement);
+    });
+
+    document.getElementById('submit-btn').disabled = true;
+}
+
+function selectAnswer(selectedIndex) {
+    const choices = document.querySelectorAll('.choice');
+    choices.forEach(choice => choice.classList.remove('selected'));
+    choices[selectedIndex].classList.add('selected');
+    document.getElementById('submit-btn').disabled = false;
+    document.selectedAnswer = selectedIndex;
+}
+
+function submitAnswer() {
+    const selectedAnswer = document.selectedAnswer;
+    const currentQuestion = quizData[currentQuestionIndex];
+
+    const feedback = document.getElementById("feedback");
+
+    if (selectedAnswer === currentQuestion.correctAnswer) {
+        feedback.textContent = "Correct!";
+        feedback.style.color = "green";
+        score++;
+    } else {
+        feedback.textContent = "Incorrect!";
+        feedback.style.color = "red";
+    }
+
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('next-btn').style.display = "inline-block";
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+
+    if (currentQuestionIndex < quizData.length) {
+        loadQuestion();
+        document.getElementById('next-btn').style.display = "none";
+    } else {
+        displayResults();
+    }
+}
+
+function displayResults() {
+    document.getElementById('question-container').style.display = "none";
+    document.getElementById('submit-btn').style.display = "none";
+    document.getElementById('next-btn').style.display = "none";
+
+    const results = document.getElementById('results');
+    results.style.display = "block";
+
+    const scoreDisplay = document.getElementById('score');
+    scoreDisplay.textContent = `${score} out of ${quizData.length}`;
+}
+
+function restartQuiz() {
+    score = 0;
+    currentQuestionIndex = 0;
+
+    document.getElementById('results').style.display = "none";
+    document.getElementById('question-container').style.display = "block";
+    document.getElementById('submit-btn').style.display = "inline-block";
+
+    loadQuestion();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadQuestion();
+});
+
+</script>
+</html>
